@@ -20,6 +20,8 @@ var noChoice = "";
 
 var player1Name = "Player 1";
 var player2Name = "Player 2";
+var player1Choice;
+var player2Choice;
 
 // create dynamic variables to track firebase data
 var playerName = noPlayer;
@@ -34,10 +36,11 @@ database.ref().on("value", function(snapshot) {
 
     player1Name = snapshot.val().players.player1.name;
     $("#player1name").text(player1Name);
+    player1Choice = snapshot.val().players.player1.choice;
     
     player2Name = snapshot.val().players.player2.name;
     $("#player2name").text(player2Name);
-
+    player2Choice = snapshot.val().players.player2.choice;
 
 }, function(errorObject) {
     console.log("The read failed: " + errorObject.code);
@@ -46,21 +49,61 @@ database.ref().on("value", function(snapshot) {
 // -------------------------------------------------------------------------------------------------------------
 $(document).ready(function() {
 
+    function populateChoices() {
+
+    }
+
     function gameAsPlayer1() {
-        // add code here
-        console.log("this is player 1")
+        $("#gamePlayerForm").text("");
         $("#top1").text("ROCK")
         $("#middle1").text("PAPER")
         $("#bottom1").text("SCISSORS")
 
+        $(".choiceButton").on("click", function() {
+            var player1Choice = $(this).val();
+            console.log("choice: " + player1Choice);
+
+            // Update firebase with player 1 choice
+            database.ref().set({
+                players: {
+                    player1: {name: player1Name, wins: gameWins, losses: gameLosses, choice: player1Choice},
+                    player2: {name: player2Name, wins: gameWins, losses: gameLosses, choice: player2Choice}
+                }
+            });
+
+            // if (player1Choice !== "" && player2Choice !== "") {
+            //     $("#gameWinner").text("Both Players have made a choice.")
+            //     console.log(player1Choice + " vs " + player2Choice);
+            // }
+        });
+
     };
 
     function gameAsPlayer2() {
-        // add code here
-        console.log("this is player 2")
+        $("#gamePlayerForm").text("");
         $("#top2").text("ROCK")
         $("#middle2").text("PAPER")
         $("#bottom2").text("SCISSORS")
+
+        $(".choiceButton").on("click", function() {
+            var player2Choice = $(this).val();
+            console.log("choice: " + player2Choice);
+
+            // Update firebase with player 2 choice
+            database.ref().set({
+                players: {
+                    player1: {name: player1Name, wins: gameWins, losses: gameLosses, choice: player1Choice},
+                    player2: {name: player2Name, wins: gameWins, losses: gameLosses, choice: player2Choice}
+                }
+            });
+            
+            if (player1Choice !== "" && player2Choice !== "") {
+                $("#gameWinner").text("Both Players have made a choice.")
+                console.log(player1Choice + " vs " + player2Choice);
+            }
+
+        });
+
 
     };
 
@@ -77,21 +120,10 @@ $(document).ready(function() {
             // Save player1 values to Firebase
             database.ref().set({
                 players: {
-                    player1: {
-                        name: player1Name, 
-                        wins: gameWins, 
-                        losses: gameLosses, 
-                        choice: rpsChoice
-                    },
-                    player2: {
-                        name: player2Name, 
-                        wins: gameWins, 
-                        losses: gameLosses, 
-                        choice: rpsChoice                    
-                    }
+                    player1: {name: player1Name, wins: gameWins, losses: gameLosses, choice: rpsChoice},
+                    player2: {name: player2Name, wins: gameWins, losses: gameLosses, choice: rpsChoice}
                 }
             });
-
             gameAsPlayer1();
 
         }else if (player2Name === "Player 2"){
@@ -99,28 +131,18 @@ $(document).ready(function() {
             // Save player2 values to Firebase
             database.ref().set({
                 players: {
-                    player1: {
-                        name: player1Name, 
-                        wins: gameWins, 
-                        losses: gameLosses, 
-                        choice: rpsChoice
-                    },
-                    player2: {
-                        name: player2Name, 
-                        wins: gameWins, 
-                        losses: gameLosses, 
-                        choice: rpsChoice                    
-                    }
+                    player1: {name: player1Name, wins: gameWins, losses: gameLosses, choice: rpsChoice},
+                    player2: {name: player2Name, wins: gameWins, losses: gameLosses, choice: rpsChoice}
                 }            
             });
-
             gameAsPlayer2();
+            
         }else {
          alert("Two players already playing. Try again later.")   
         };
         
     });
-
+ 
     // Whenever a user refreshes or closes window tab
     window.onunload = function(){
         database.ref().set({
