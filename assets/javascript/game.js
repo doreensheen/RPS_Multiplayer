@@ -37,10 +37,14 @@ database.ref().on("value", function(snapshot) {
     player1Name = snapshot.val().players.player1.name;
     $("#player1name").text(player1Name);
     player1Choice = snapshot.val().players.player1.choice;
+    player1Wins = snapshot.val().players.player1.wins;
+    player1Losses = snapshot.val().players.player1.losses;
     
     player2Name = snapshot.val().players.player2.name;
     $("#player2name").text(player2Name);
     player2Choice = snapshot.val().players.player2.choice;
+    player2Wins = snapshot.val().players.player2.wins;
+    player2Losses = snapshot.val().players.player2.losses;
 
 }, function(errorObject) {
     console.log("The read failed: " + errorObject.code);
@@ -55,17 +59,35 @@ $(document).ready(function() {
             $("#gameWinner").text("Tie Game");
         } else if (player1Choice === "rock" && player2Choice === "paper") {
             $("#gameWinner").text(player2Name + " Wins")
+            player1Losses++;
+            player2Wins++
         } else if (player1Choice === "rock" && player2Choice === "scissors") {
             $("#gameWinner").text(player1Name + " Wins")
+            player1Wins++;
+            player2Losses++
         } else if (player1Choice === "paper" && player2Choice === "rock") {
             $("#gameWinner").text(player1Name + " Wins")
+            player1Wins++;
+            player2Losses++
         } else if (player1Choice === "paper" && player2Choice === "scissors") {
             $("#gameWinner").text(player2Name + " Wins")
+            player1Losses++;
+            player2Wins++
         } else if (player1Choice === "scissors" && player2Choice === "rock") {
             $("#gameWinner").text(player2Name + " Wins")
+            player1Losses++;
+            player2Wins++
         } else if (player1Choice === "scissors" && player2Choice === "paper") {
             $("#gameWinner").text(player1Name + " Wins")
+            player1Wins++;
+            player2Losses++
         }
+
+        $("#wins1").text("Wins: " + player1Wins)
+        $("#losses1").text("Losses: " + player1Losses)
+        $("#wins2").text("Wins: " + player2Wins)
+        $("#losses2").text("Losses: " + player2Losses)
+
         // reset player choices to null
         setTimeout(function() {
             player1Choice = "";
