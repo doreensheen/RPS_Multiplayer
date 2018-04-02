@@ -49,7 +49,36 @@ database.ref().on("value", function(snapshot) {
 // -------------------------------------------------------------------------------------------------------------
 $(document).ready(function() {
 
-    function populateChoices() {
+    function determineWinner() {
+        database.ref().on("value", function(snapshot) {
+
+            player1Name = snapshot.val().players.player1.name;
+            $("#player1name").text(player1Name);
+            player1Choice = snapshot.val().players.player1.choice;
+            
+            player2Name = snapshot.val().players.player2.name;
+            $("#player2name").text(player2Name);
+            player2Choice = snapshot.val().players.player2.choice;
+        
+        }, function(errorObject) {
+            console.log("The read failed: " + errorObject.code);
+        });
+        
+        if (player1Choice === player2Choice) {
+            $("#gameWinner").text("Tie Game");
+        } else if (player1Choice === "rock" && player2Choice === "paper") {
+            $("#gameWinner").text(player2Name + " Wins")
+        } else if (player1Choice === "rock" && player2Choice === "scissors") {
+            $("#gameWinner").text(player1Name + " Wins")
+        } else if (player1Choice === "paper" && player2Choice === "rock") {
+            $("#gameWinner").text(player1Name + " Wins")
+        } else if (player1Choice === "paper" && player2Choice === "scissors") {
+            $("#gameWinner").text(player2Name + " Wins")
+        } else if (player1Choice === "scissors" && player2Choice === "rock") {
+            $("#gameWinner").text(player2Name + " Wins")
+        } else if (player1Choice === "scissors" && player2Choice === "paper") {
+            $("#gameWinner").text(player1Name + " Wins")
+        }   
 
     }
 
@@ -70,13 +99,16 @@ $(document).ready(function() {
                     player2: {name: player2Name, wins: gameWins, losses: gameLosses, choice: player2Choice}
                 }
             });
+            // need event listener to trigger if statement
+            database.ref("players/player2").on("child_changed", function(snap) {
+                var player2Choice = snap.val();
+            if (player1Choice !== "" && player2Choice !== "") {
+                determineWinner();
+                console.log(player1Choice + " vs " + player2Choice);
+            }
+            });
 
-            // if (player1Choice !== "" && player2Choice !== "") {
-            //     $("#gameWinner").text("Both Players have made a choice.")
-            //     console.log(player1Choice + " vs " + player2Choice);
-            // }
         });
-
     };
 
     function gameAsPlayer2() {
@@ -98,7 +130,7 @@ $(document).ready(function() {
             });
             
             if (player1Choice !== "" && player2Choice !== "") {
-                $("#gameWinner").text("Both Players have made a choice.")
+                determineWinner();
                 console.log(player1Choice + " vs " + player2Choice);
             }
 
@@ -165,4 +197,3 @@ $(document).ready(function() {
     };
 
 });
-
